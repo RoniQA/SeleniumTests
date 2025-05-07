@@ -33,22 +33,14 @@ jobs:
       - name: Install SpecFlow+ LivingDoc CLI
         run: dotnet tool install --global SpecFlow.Plus.LivingDoc.CLI
 
-      - name: Add dotnet tools to PATH (Windows)
-        shell: pwsh
-        run: |
-          echo "$env:USERPROFILE\.dotnet\tools" | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
-
-      - name: Refresh shell to use dotnet tools
-        shell: pwsh
-        run: |
-          $env:PATH += ";$env:USERPROFILE\.dotnet\tools"
-          Get-Command livingdoc
-
       - name: Generate LivingDoc HTML report
         shell: pwsh
         run: |
-          $env:PATH += ";$env:USERPROFILE\.dotnet\tools"
-          dotnet livingdoc export --test-results TestResults.trx --output LivingDoc.html
+          $livingdocPath = "$env:USERPROFILE\.dotnet\tools\livingdoc.exe"
+          if (!(Test-Path $livingdocPath)) {
+            throw "LivingDoc executable not found at $livingdocPath"
+          }
+          & $livingdocPath export --test-results TestResults.trx --output LivingDoc.html
 
       - name: Upload LivingDoc report
         uses: actions/upload-artifact@v4
