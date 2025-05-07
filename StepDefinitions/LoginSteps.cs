@@ -1,4 +1,5 @@
 using System;
+using AventStack.ExtentReports;
 using LightBDD.XUnit2;
 using LightBDD.Framework.Scenarios;
 using OpenQA.Selenium;
@@ -6,51 +7,61 @@ using OpenQA.Selenium.Chrome;
 using WebDriverManager;
 using WebDriverManager.DriverConfigs.Impl;
 using Xunit;
+using SeleniumTests.Hooks;
 
 namespace SeleniumTests.StepDefinitions
 {
     public partial class LoginSteps : FeatureFixture, IDisposable
     {
         private IWebDriver _driver;
+        private ExtentTest _test;
 
         public LoginSteps()
         {
-            // Configurando o WebDriverManager para garantir que o ChromeDriver esteja sempre atualizado
             new DriverManager().SetUpDriver(new ChromeConfig());
-
-            // Instanciando o ChromeDriver após a configuração do WebDriverManager
             _driver = new ChromeDriver(ConfigureChromeOptions());
+
+            // Cria o cenário de teste no relatório
+            _test = TestSetup.Extent.CreateTest("UserLogsInSuccessfully - Cenário de Login com sucesso");
         }
 
         private ChromeOptions ConfigureChromeOptions()
         {
             var options = new ChromeOptions();
-            options.AddArgument("--headless");  // Rodar sem interface gráfica
-            options.AddArgument("--no-sandbox");  // Permite rodar no ambiente CI
-            options.AddArgument("--disable-dev-shm-usage");  // Desativa o uso de memória compartilhada
-            options.AddArgument("--remote-debugging-port=9222");  // Habilita a depuração remota
-            options.AddArgument("--disable-gpu");  // Desativa o uso de GPU (necessário no Linux)
+            options.AddArgument("--headless");
+            options.AddArgument("--no-sandbox");
+            options.AddArgument("--disable-dev-shm-usage");
+            options.AddArgument("--remote-debugging-port=9222");
+            options.AddArgument("--disable-gpu");
             return options;
         }
 
         [Scenario]
         public void UserLogsInSuccessfully()
         {
-            Runner.RunScenario(
-                given => GivenIAmOnTheLoginPage(),
-                when => WhenIEnterValidCredentials(),
-                then => ThenIShouldBeLoggedIn()
-            );
+            try
+            {
+                Runner.RunScenario(
+                    given => GivenIAmOnTheLoginPage(),
+                    when => WhenIEnterValidCredentials(),
+                    then => ThenIShouldBeLoggedIn()
+                );
+                _test.Pass("Cenário executado com sucesso.");
+            }
+            catch (Exception ex)
+            {
+                _test.Fail($"Erro no cenário: {ex.Message}");
+                throw;
+            }
         }
 
-        // Given step
         private void GivenIAmOnTheLoginPage()
         {
             _driver.Navigate().GoToUrl("https://www.saucedemo.com/");
-            System.Threading.Thread.Sleep(1000); // Aguarda a página carregar
+            _test.Info("Naveguei até a página de login.");
+            System.Threading.Thread.Sleep(1000);
         }
 
-        // When step
         private void WhenIEnterValidCredentials()
         {
             var usernameField = _driver.FindElement(By.Id("user-name"));
@@ -61,20 +72,21 @@ namespace SeleniumTests.StepDefinitions
             passwordField.SendKeys("secret_sauce");
             loginButton.Click();
 
-            System.Threading.Thread.Sleep(2000); // Aguarda o login
+            _test.Info("Credenciais válidas inseridas e botão de login clicado.");
+            System.Threading.Thread.Sleep(2000);
         }
 
-        // Then step
         private void ThenIShouldBeLoggedIn()
         {
             var inventoryPage = _driver.FindElement(By.ClassName("inventory_list"));
-            Assert.True(inventoryPage.Displayed, "Login não foi bem-sucedido, a página de inventário não foi exibida.");
+            Assert.True(inventoryPage.Displayed, "Login não foi bem-sucedido.");
+            _test.Pass("Login realizado com sucesso e página de inventário exibida.");
         }
 
-        // Cleanup
         public void Dispose()
         {
             _driver.Quit();
+            _test.Info("Driver encerrado.");
         }
     }
 }
