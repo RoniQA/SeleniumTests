@@ -40,7 +40,7 @@ jobs:
           if (!(Test-Path $livingdocPath)) {
             throw "LivingDoc executable not found at $livingdocPath"
           }
-          & $livingdocPath export --test-results TestResults.trx --output LivingDoc.html
+          & $livingdocPath test-assembly .\bin\Debug\net8.0\SeleniumTests.dll --test-results TestResults.trx --output LivingDoc.html
 
       - name: Upload LivingDoc report
         uses: actions/upload-artifact@v4
