@@ -14,7 +14,18 @@ namespace SeleniumTests.StepDefinitions
 
         public LoginSteps()
         {
-            _driver = new ChromeDriver();
+            _driver = new ChromeDriver(ConfigureChromeOptions());
+        }
+
+        private ChromeOptions ConfigureChromeOptions()
+        {
+            var options = new ChromeOptions();
+            options.AddArgument("--headless");  // Rodar sem interface gráfica
+            options.AddArgument("--no-sandbox");  // Permite rodar no ambiente CI
+            options.AddArgument("--disable-dev-shm-usage");  // Desativa o uso de memória compartilhada
+            options.AddArgument("--remote-debugging-port=9222");  // Habilita a depuração remota
+            options.AddArgument("--disable-gpu");  // Desativa o uso de GPU (necessário no Linux)
+            return options;
         }
 
         [Scenario]
@@ -56,7 +67,7 @@ namespace SeleniumTests.StepDefinitions
         }
 
         // Cleanup
-        public void Dispose()  // Tornando o Dispose público
+        public void Dispose()
         {
             _driver.Quit();
         }
