@@ -40,6 +40,7 @@ jobs:
           wget https://chromedriver.storage.googleapis.com/114.0.5735.90/chromedriver_linux64.zip
           unzip chromedriver_linux64.zip
           sudo mv chromedriver /usr/local/bin/
+          sudo chmod +x /usr/local/bin/chromedriver
 
       - name: Build project
         run: dotnet build --configuration Release
@@ -48,7 +49,11 @@ jobs:
         run: dotnet test --configuration Release --no-build --logger "nunit;LogFilePath=./TestResults/results.xml" --verbosity normal
 
       - name: Upload test results as artifact
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v4
         with:
           name: test-results
           path: ./TestResults/results.xml
+
+      - name: Fallback - Print results on failure
+        if: ${{ failure() }}
+        run: cat ./TestResults/results.xml || echo "Test results not found."
