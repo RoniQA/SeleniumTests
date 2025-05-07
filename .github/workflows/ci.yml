@@ -1,46 +1,47 @@
-name: Run Selenium Tests with SpecFlow
+name: Selenium SpecFlow CI
 
 on:
   push:
     branches:
-      - master
+      - main
   pull_request:
     branches:
-      - master
+      - main
 
 jobs:
-  build-and-test:
+  build-test:
     runs-on: windows-latest
 
     steps:
-      - name: Checkout code
+      - name: Checkout repository
         uses: actions/checkout@v3
 
       - name: Setup .NET
         uses: actions/setup-dotnet@v4
         with:
-          dotnet-version: '8.0.x'
+          dotnet-version: 8.0.x
 
       - name: Restore dependencies
         run: dotnet restore
 
       - name: Build project
-        run: dotnet build --no-restore
+        run: dotnet build --no-restore --configuration Debug
 
-      - name: Run tests and generate .trx report
+      - name: Run tests and generate TRX
         run: dotnet test --no-build --logger "trx;LogFileName=TestResults.trx"
 
       - name: Install SpecFlow+ LivingDoc CLI
         run: dotnet tool install --global SpecFlow.Plus.LivingDoc.CLI
 
-      - name: Add dotnet tools to PATH
-        run: echo "$HOME/.dotnet/tools" >> $GITHUB_PATH
+      - name: Add dotnet tools to PATH (Windows)
+        shell: pwsh
+        run: echo "$env:USERPROFILE\.dotnet\tools" | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
 
-      - name: Generate LivingDoc HTML report
+      - name: Generate LivingDoc report
         run: dotnet livingdoc export --test-results TestResults.trx --output LivingDoc.html
 
-      - name: Upload LivingDoc report
-        uses: actions/upload-artifact@v4
+      - name: Upload LivingDoc Report
+        uses: actions/upload-artifact@v3
         with:
-          name: livingdoc-report
+          name: LivingDoc
           path: LivingDoc.html
