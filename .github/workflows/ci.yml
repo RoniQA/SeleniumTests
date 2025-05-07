@@ -45,17 +45,29 @@ jobs:
       - name: Build project
         run: dotnet build --configuration Release
 
-      - name: Run tests with NUnit and generate TRX report
+      - name: Run tests and generate TRX report
         run: |
           mkdir -p TestResults
           dotnet test --configuration Release --no-build --logger "trx;LogFileName=results.trx" --results-directory ./TestResults
 
-      - name: Upload test results as artifact
+      - name: Install ReportGenerator
+        run: dotnet tool install --global dotnet-reportgenerator-globaltool
+
+      - name: Generate HTML report
+        run: |
+          reportgenerator \
+            -reports:TestResults/results.trx \
+            -targetdir:TestResults/Report \
+            -reporttypes:Html
+
+      - name: Upload TRX file
         uses: actions/upload-artifact@v4
         with:
-          name: test-results
+          name: test-results-trx
           path: ./TestResults/results.trx
 
-      - name: Fallback - Print results on failure
-        if: ${{ failure() }}
-        run: cat ./TestResults/results.trx || echo "Test results not found."
+      - name: Upload HTML report
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-results-html
+          path: ./TestResults/Report
