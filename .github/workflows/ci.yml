@@ -29,7 +29,7 @@ jobs:
 
       - name: Run tests and generate .trx and TestExecution.json
         run: |
-          dotnet test --no-build --logger "trx;LogFileName=TestResults.trx" --logger "specflowjson:LogFileName=TestExecution.json"
+          dotnet test --no-build --logger "trx;LogFileName=TestResults.trx" --logger "specflowjson;LogFileName=TestExecution.json"
 
       - name: Install SpecFlow+ LivingDoc CLI globally
         run: dotnet tool install --global SpecFlow.Plus.LivingDoc.CLI
@@ -54,3 +54,9 @@ jobs:
         with:
           name: livingdoc-report
           path: LivingDoc.html
+
+      - name: Upload test results (trx)
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-results
+          path: TestResults.trx
