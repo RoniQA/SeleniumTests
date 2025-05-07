@@ -3,7 +3,8 @@ using LightBDD.XUnit2;
 using LightBDD.Framework.Scenarios;
 using OpenQA.Selenium;
 using OpenQA.Selenium.Chrome;
-using System.Threading;
+using WebDriverManager;
+using WebDriverManager.DriverConfigs.Impl;
 using Xunit;
 
 namespace SeleniumTests.StepDefinitions
@@ -14,6 +15,10 @@ namespace SeleniumTests.StepDefinitions
 
         public LoginSteps()
         {
+            // Configurando o WebDriverManager para garantir que o ChromeDriver esteja sempre atualizado
+            new DriverManager().SetUpDriver(new ChromeConfig());
+
+            // Instanciando o ChromeDriver após a configuração do WebDriverManager
             _driver = new ChromeDriver(ConfigureChromeOptions());
         }
 
@@ -42,7 +47,7 @@ namespace SeleniumTests.StepDefinitions
         private void GivenIAmOnTheLoginPage()
         {
             _driver.Navigate().GoToUrl("https://www.saucedemo.com/");
-            Thread.Sleep(1000); // Aguarda a página carregar
+            System.Threading.Thread.Sleep(1000); // Aguarda a página carregar
         }
 
         // When step
@@ -56,7 +61,7 @@ namespace SeleniumTests.StepDefinitions
             passwordField.SendKeys("secret_sauce");
             loginButton.Click();
 
-            Thread.Sleep(2000); // Aguarda o login
+            System.Threading.Thread.Sleep(2000); // Aguarda o login
         }
 
         // Then step
