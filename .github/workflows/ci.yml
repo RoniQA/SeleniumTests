@@ -40,33 +40,30 @@ jobs:
           wget https://chromedriver.storage.googleapis.com/114.0.5735.90/chromedriver_linux64.zip
           unzip chromedriver_linux64.zip
           sudo mv chromedriver /usr/local/bin/
-          sudo chmod +x /usr/local/bin/chromedriver
 
       - name: Build project
         run: dotnet build --configuration Release
 
       - name: Run tests and generate TRX report
-        run: |
-          mkdir -p TestResults
-          dotnet test --configuration Release --no-build --logger "trx;LogFileName=results.trx" --results-directory ./TestResults
+        run: dotnet test --configuration Release --no-build --logger "trx;LogFileName=results.trx"
 
-      - name: Install ReportGenerator
-        run: dotnet tool install --global dotnet-reportgenerator-globaltool
+      - name: Install ReportGenerator tool
+        run: dotnet tool install -g dotnet-reportgenerator-globaltool
 
-      - name: Generate clean HTML report
+      - name: Add tool path to environment
+        run: echo "${HOME}/.dotnet/tools" >> $GITHUB_PATH
+
+      - name: Generate HTML report
         run: |
           reportgenerator \
             -reports:TestResults/results.trx \
             -targetdir:TestResults/Report \
-            -reporttypes:HtmlInline_AzurePipelines; \
+            -reporttypes:HtmlInline_AzurePipelines \
             -assemblyfilters:+SeleniumTests \
             -filefilters:-*Program.cs
 
-      - name: Rename index file for direct access
-        run: mv TestResults/Report/index.html TestResults/TestReport.html
-
-      - name: Upload direct-access HTML report
-        uses: actions/upload-artifact@v4
+      - name: Upload HTML report as artifact
+        uses: actions/upload-artifact@v3
         with:
           name: test-report
-          path: ./TestResults/TestReport.html
+          path: TestResults/Report/index.html
