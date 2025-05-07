@@ -44,11 +44,11 @@ jobs:
       - name: Build project
         run: dotnet build --configuration Release
 
-      - name: Run tests (generates ExtentReport via code)
+      - name: Run tests
         run: dotnet test --configuration Release --no-build
 
-      - name: Upload ExtentReports.html
+      - name: Upload ExtentReport as artifact
         uses: actions/upload-artifact@v4
         with:
-          name: ExtentReport
-          path: TestResults/ExtentReports.html
+          name: extent-report
+          path: TestResults/ExtentReport.html
