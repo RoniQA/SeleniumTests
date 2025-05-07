@@ -1,38 +1,63 @@
+using System;
+using LightBDD.XUnit2;
+using LightBDD.Framework.Scenarios;
 using OpenQA.Selenium;
 using OpenQA.Selenium.Chrome;
-using SeleniumTests.Pages;
-using TechTalk.SpecFlow;
-using NUnit.Framework;
+using System.Threading;
+using Xunit;
 
 namespace SeleniumTests.StepDefinitions
 {
-    [Binding]
-    public class LoginSteps
+    public partial class LoginSteps : FeatureFixture, IDisposable
     {
         private IWebDriver _driver;
-        private LoginPage _loginPage;
 
-        [Given(@"I am on the login page")]
-        public void GivenIAmOnTheLoginPage()
+        public LoginSteps()
         {
             _driver = new ChromeDriver();
-            _loginPage = new LoginPage(_driver);
-            _loginPage.Navigate();
         }
 
-        [When(@"I enter invalid credentials")]
-        public void WhenIEnterInvalidCredentials()
+        [Scenario]
+        public void UserLogsInSuccessfully()
         {
-            _loginPage.Login("invalid_user", "invalid_password");
+            Runner.RunScenario(
+                given => GivenIAmOnTheLoginPage(),
+                when => WhenIEnterValidCredentials(),
+                then => ThenIShouldBeLoggedIn()
+            );
         }
 
-        [Then(@"I should see an error message")]
-        public void ThenIShouldSeeAnErrorMessage()
+        // Given step
+        private void GivenIAmOnTheLoginPage()
         {
-            string errorMessage = _loginPage.GetErrorMessage();
-            Assert.IsTrue(errorMessage.Contains("Username and password do not match")
-                          || errorMessage.Contains("do not match any user"),
-                          $"Mensagem de erro inesperada: {errorMessage}");
+            _driver.Navigate().GoToUrl("https://www.saucedemo.com/");
+            Thread.Sleep(1000); // Aguarda a página carregar
+        }
+
+        // When step
+        private void WhenIEnterValidCredentials()
+        {
+            var usernameField = _driver.FindElement(By.Id("user-name"));
+            var passwordField = _driver.FindElement(By.Id("password"));
+            var loginButton = _driver.FindElement(By.Id("login-button"));
+
+            usernameField.SendKeys("standard_user");
+            passwordField.SendKeys("secret_sauce");
+            loginButton.Click();
+
+            Thread.Sleep(2000); // Aguarda o login
+        }
+
+        // Then step
+        private void ThenIShouldBeLoggedIn()
+        {
+            var inventoryPage = _driver.FindElement(By.ClassName("inventory_list"));
+            Assert.True(inventoryPage.Displayed, "Login não foi bem-sucedido, a página de inventário não foi exibida.");
+        }
+
+        // Cleanup
+        public void Dispose()  // Tornando o Dispose público
+        {
             _driver.Quit();
         }
     }

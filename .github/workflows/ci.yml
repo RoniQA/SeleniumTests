@@ -1,54 +1,39 @@
-name: Run Selenium Tests with SpecFlow
+name: Test with Selenium and LightBDD
 
 on:
   push:
     branches:
-      - master
+      - main
   pull_request:
     branches:
-      - master
+      - main
 
 jobs:
-  build-and-test:
-    runs-on: windows-latest
+  build:
+    runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout code
+      - name: Checkout repository
         uses: actions/checkout@v3
 
-      - name: Setup .NET
-        uses: actions/setup-dotnet@v4
+      - name: Set up .NET SDK
+        uses: actions/setup-dotnet@v3
         with:
-          dotnet-version: '8.0.x'
+          dotnet-version: '7.0'  # Certifique-se de que a versão do .NET está correta
 
       - name: Restore dependencies
         run: dotnet restore
 
-      - name: Build project
-        run: dotnet build --no-restore
-
-      - name: Run tests and generate .trx
-        run: dotnet test --no-build --logger "trx;LogFileName=TestResults.trx"
-
-      - name: Install SpecFlow+ LivingDoc CLI globally
-        run: dotnet tool install --global SpecFlow.Plus.LivingDoc.CLI
-
-      - name: Add .NET tools to PATH
-        shell: pwsh
-        run: echo "$env:USERPROFILE\.dotnet\tools" | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
-
-      - name: Generate LivingDoc HTML report
-        shell: pwsh
+      - name: Install dependencies for Selenium
         run: |
-          $livingdocPath = "$env:USERPROFILE\.dotnet\tools\livingdoc.exe"
-          if (!(Test-Path $livingdocPath)) {
-            throw "LivingDoc executable not found at $livingdocPath"
-          }
-          & $livingdocPath test-assembly ".\bin\Debug\net8.0\SeleniumTests.dll" `
-            --output "LivingDoc.html"
+          sudo apt-get update
+          sudo apt-get install -y wget unzip
+          wget https://chromedriver.storage.googleapis.com/114.0.5735.90/chromedriver_linux64.zip
+          unzip chromedriver_linux64.zip
+          sudo mv chromedriver /usr/local/bin/
 
-      - name: Upload LivingDoc report
-        uses: actions/upload-artifact@v4
-        with:
-          name: livingdoc-report
-          path: LivingDoc.html
+      - name: Build project
+        run: dotnet build --configuration Release
+
+      - name: Run tests with NUnit
+        run: dotnet test --configuration Release --no-build --verbosity normal
