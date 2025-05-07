@@ -1,12 +1,12 @@
-name: Test with Selenium and LightBDD
+name: .NET Build and Test with Selenium and LightBDD
 
 on:
   push:
     branches:
-      - master
+      - main
   pull_request:
     branches:
-      - master
+      - main
 
 jobs:
   build:
@@ -16,10 +16,10 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v3
 
-      - name: Set up .NET SDK
+      - name: Set up .NET SDK 8.0
         uses: actions/setup-dotnet@v3
         with:
-          dotnet-version: '7.0'  # Certifique-se de que a versão do .NET está correta
+          dotnet-version: '8.0'
 
       - name: Restore dependencies
         run: dotnet restore
