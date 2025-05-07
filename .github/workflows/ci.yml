@@ -48,7 +48,7 @@ jobs:
         run: dotnet test --configuration Release --no-build --logger "nunit;LogFilePath=./TestResults/results.xml" --verbosity normal
 
       - name: Upload test results as artifact
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v2
         with:
           name: test-results
           path: ./TestResults/results.xml
