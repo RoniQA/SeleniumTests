@@ -1,4 +1,4 @@
-name: Test with Selenium and LightBDD
+name: Run Selenium Tests
 
 on:
   push:
@@ -24,7 +24,7 @@ jobs:
       - name: Restore dependencies
         run: dotnet restore
 
-      - name: Install dependencies for Selenium and Chrome
+      - name: Install Chrome dependencies
         run: |
           sudo apt-get update
           sudo apt-get install -y wget unzip \
@@ -46,9 +46,3 @@ jobs:
 
       - name: Run tests
         run: dotnet test --configuration Release --no-build
-
-      - name: Upload ExtentReport as artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: extent-report
-          path: TestResults/ExtentReport.html
