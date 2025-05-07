@@ -27,8 +27,8 @@ jobs:
       - name: Build project
         run: dotnet build --no-restore
 
-      - name: Run tests and generate .trx report
-        run: dotnet test --no-build --logger "trx;LogFileName=TestResults.trx"
+      - name: Run tests and generate JSON report
+        run: dotnet test --no-build --logger "json;LogFileName=TestResults.json"
 
       - name: Install SpecFlow+ LivingDoc CLI
         run: dotnet tool install --global SpecFlow.Plus.LivingDoc.CLI
@@ -40,7 +40,9 @@ jobs:
           if (!(Test-Path $livingdocPath)) {
             throw "LivingDoc executable not found at $livingdocPath"
           }
-          & $livingdocPath test-assembly .\bin\Debug\net8.0\SeleniumTests.dll --test-results TestResults.trx --output LivingDoc.html
+          & $livingdocPath test-assembly .\bin\Debug\net8.0\SeleniumTests.dll `
+            --test-execution-json TestResults.json `
+            --output LivingDoc.html
 
       - name: Upload LivingDoc report
         uses: actions/upload-artifact@v4
