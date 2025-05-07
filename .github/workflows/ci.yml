@@ -44,26 +44,21 @@ jobs:
       - name: Build project
         run: dotnet build --configuration Release
 
-      - name: Run tests and generate TRX report
+      - name: Run tests and generate .trx report
         run: dotnet test --configuration Release --no-build --logger "trx;LogFileName=results.trx"
 
-      - name: Install ReportGenerator tool
-        run: dotnet tool install -g dotnet-reportgenerator-globaltool
-
-      - name: Add tool path to environment
-        run: echo "${HOME}/.dotnet/tools" >> $GITHUB_PATH
+      - name: Install ReportGenerator
+        run: dotnet tool install --global dotnet-reportgenerator-globaltool
 
       - name: Generate HTML report
         run: |
           reportgenerator \
             -reports:TestResults/results.trx \
             -targetdir:TestResults/Report \
-            -reporttypes:HtmlInline_AzurePipelines \
-            -assemblyfilters:+SeleniumTests \
-            -filefilters:-*Program.cs
+            -reporttypes:HtmlInline_AzurePipelines
 
       - name: Upload HTML report as artifact
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v2
         with:
           name: test-report
           path: TestResults/Report/index.html
