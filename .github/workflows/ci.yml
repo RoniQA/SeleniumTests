@@ -1,4 +1,4 @@
-name: .NET Build and Test with Selenium and LightBDD
+name: Test with Selenium and LightBDD
 
 on:
   push:
@@ -44,5 +44,11 @@ jobs:
       - name: Build project
         run: dotnet build --configuration Release
 
-      - name: Run tests with NUnit
-        run: dotnet test --configuration Release --no-build --verbosity normal
+      - name: Run tests with NUnit and generate report
+        run: dotnet test --configuration Release --no-build --logger "nunit;LogFilePath=./TestResults/results.xml" --verbosity normal
+
+      - name: Upload test results as artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: test-results
+          path: ./TestResults/results.xml
