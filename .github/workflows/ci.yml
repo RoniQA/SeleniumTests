@@ -45,15 +45,17 @@ jobs:
       - name: Build project
         run: dotnet build --configuration Release
 
-      - name: Run tests with NUnit and generate report
-        run: dotnet test --configuration Release --no-build --logger "nunit;LogFilePath=./TestResults/results.xml" --verbosity normal
+      - name: Run tests with NUnit and generate TRX report
+        run: |
+          mkdir -p TestResults
+          dotnet test --configuration Release --no-build --logger "trx;LogFileName=results.trx" --results-directory ./TestResults
 
       - name: Upload test results as artifact
         uses: actions/upload-artifact@v4
         with:
           name: test-results
-          path: ./TestResults/results.xml
+          path: ./TestResults/results.trx
 
       - name: Fallback - Print results on failure
         if: ${{ failure() }}
-        run: cat ./TestResults/results.xml || echo "Test results not found."
+        run: cat ./TestResults/results.trx || echo "Test results not found."
