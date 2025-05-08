@@ -1,6 +1,4 @@
 using System;
-using LightBDD.XUnit2;
-using LightBDD.Framework.Scenarios;
 using OpenQA.Selenium;
 using OpenQA.Selenium.Chrome;
 using WebDriverManager;
@@ -24,13 +22,14 @@ namespace SeleniumTests.Steps
             _loginPage = new LoginPage(_driver);
         }
 
-        public void Given_I_am_on_login_page() => _loginPage.Navigate();
+        public void Given_I_am_on_login_page() =>
+            _loginPage.Navigate();
 
         public void When_I_login_with_valid_credentials() =>
             _loginPage.Login("standard_user", "secret_sauce");
 
         public void Then_I_should_see_the_inventory_page() =>
-            Assert.True(_loginPage.InventoryList.Displayed);
+            Assert.True(_loginPage.IsInventoryVisible);
 
         public void When_I_login_with_invalid_username() =>
             _loginPage.Login("invalid_user", "secret_sauce");
@@ -43,23 +42,20 @@ namespace SeleniumTests.Steps
 
         public void Then_I_should_see_a_login_error()
         {
-            var errorMessage = _loginPage.ErrorMessage;
-            Assert.True(errorMessage.Displayed);
-            Assert.Contains("Epic sadface", errorMessage.Text);
+            Assert.True(_loginPage.IsErrorMessageVisible);
+            Assert.Contains("Epic sadface", _loginPage.ErrorMessageText);
         }
 
         public void Then_I_should_see_required_field_error()
         {
-            var errorMessage = _loginPage.ErrorMessage;
-            Assert.True(errorMessage.Displayed);
-            Assert.Contains("Epic sadface", errorMessage.Text);
+            Assert.True(_loginPage.IsErrorMessageVisible);
+            Assert.Contains("Epic sadface", _loginPage.ErrorMessageText);
         }
 
         public void Then_I_should_see_an_error_message()
         {
-            var errorMessage = _loginPage.ErrorMessage;
-            Assert.True(errorMessage.Displayed);
-            Assert.Contains("Epic sadface", errorMessage.Text);
+            Assert.True(_loginPage.IsErrorMessageVisible);
+            Assert.Contains("Epic sadface", _loginPage.ErrorMessageText);
         }
 
         public void Dispose() => _driver.Quit();

@@ -1,4 +1,5 @@
 using OpenQA.Selenium;
+using System.Linq;
 
 namespace SeleniumTests.Pages
 {
@@ -27,8 +28,14 @@ namespace SeleniumTests.Pages
             _driver.FindElement(By.Id("login-button")).Click();
         }
 
-        public IWebElement InventoryList => _driver.FindElement(By.Id("inventory_container"));
+        public bool IsInventoryVisible =>
+            _driver.FindElements(By.Id("inventory_container")).Count > 0;
 
-        public IWebElement ErrorMessage => _driver.FindElement(By.CssSelector("[data-test='error']"));
+        public bool IsErrorMessageVisible =>
+            _driver.FindElements(By.CssSelector("[data-test='error']")).Count > 0;
+
+        public string ErrorMessageText =>
+            _driver.FindElements(By.CssSelector("[data-test='error']"))
+                   .FirstOrDefault()?.Text ?? "";
     }
 }
