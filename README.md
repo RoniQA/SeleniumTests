@@ -100,11 +100,3 @@ public void User_logs_in_successfully()
 ## 🔁 CI/CD com GitHub Actions
 
 A pipeline de CI no GitHub executa automaticamente os testes a cada push ou pull request para a branch `master`. Isso garante a validação contínua dos testes.
-
-## 🤝 Contribuição
-
-Sinta-se à vontade para contribuir! Crie uma branch, realize suas melhorias e envie um pull request. Sugestões de novos testes e melhorias são bem-vindas.
-
-## 📝 Licença
-
-Este projeto está sob a licença MIT. Veja o arquivo [LICENSE](LICENSE) para mais detalhes.
