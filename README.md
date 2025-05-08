@@ -1,78 +1,110 @@
 # Selenium Test Automation with LightBDD
 
-Este projeto utiliza **Selenium**, **LightBDD**, e **xUnit** para realizar automação de testes de login em um site de demonstração. Ele foi projetado para testar o fluxo de login de um usuário com credenciais válidas.
+Este projeto utiliza **Selenium**, **LightBDD**, e **xUnit** para realizar automaÃ§Ã£o de testes de login em um site de demonstraÃ§Ã£o. Ele foi projetado para testar o fluxo de login de um usuÃ¡rio com diferentes cenÃ¡rios.
 
 ## Tecnologias Usadas
 
-- **Selenium**: Para automação de navegação no navegador.
+- **Selenium**: Para automaÃ§Ã£o de navegaÃ§Ã£o no navegador.
 - **LightBDD**: Para escrever testes em estilo BDD (Behavior-Driven Development).
-- **xUnit**: Framework de testes unitários.
+- **xUnit**: Framework de testes unitÃ¡rios.
 - **WebDriverManager**: Para gerenciar o driver do navegador automaticamente.
 - **ChromeDriver**: Para utilizar o Google Chrome no ambiente de testes.
-- **NUnit (opcional)**: Para relatórios de testes (caso decida reverter a implementação de relatórios).
 
-## Pré-requisitos
+## PrÃ©-requisitos
 
-Antes de executar este projeto, você precisa ter as seguintes ferramentas instaladas:
+Antes de executar este projeto, vocÃª precisa ter as seguintes ferramentas instaladas:
 
 - **.NET SDK** (8.0 ou superior)
-- **Chrome** e **ChromeDriver** ou **WebDriverManager**
+- **Google Chrome** instalado localmente (ou ambiente que suporte o ChromeHeadless)
 
-## Configuração do Projeto
+## ConfiguraÃ§Ã£o do Projeto
 
-1. Clone o repositório:
+1. Clone o repositÃ³rio:
     ```bash
-    git clone https://github.com/seu-usuario/SeleniumTests.git
+    git clone https://github.com/RoniQA/SeleniumTests.git
     cd SeleniumTests
     ```
 
-2. Restaure as dependências do projeto:
+2. Restaure as dependÃªncias do projeto:
     ```bash
     dotnet restore
     ```
 
-3. **Build do Projeto**:
-    Para compilar o projeto e garantir que tudo está configurado corretamente, execute:
+3. Compile o projeto:
     ```bash
     dotnet build --configuration Release
     ```
 
-4. Para rodar os testes, basta executar o comando:
+4. Execute os testes:
     ```bash
-    dotnet test
+    dotnet test --configuration Release --no-build
     ```
 
-## Estrutura de Diretórios
+## Estrutura de DiretÃ³rios
 
-- **StepDefinitions**: Contém os arquivos de definição de passos para os testes.
-- **Drivers**: Contém configurações globais, como inicialização e finalização dos testes.
-- **Pages**: Contém as paginas que serão utilizadas.
+- **StepDefinitions**: ContÃ©m os arquivos de definiÃ§Ã£o de passos para os testes.
+- **Pages**: ContÃ©m a implementaÃ§Ã£o da estrutura Page Object Model.
+- **Utils**: Pode conter arquivos auxiliares, como mÃ©todos comuns ou helpers.
+- **TestResults**: Pasta para armazenar os resultados de execuÃ§Ã£o dos testes (caso tenha habilitado relatÃ³rios).
 
-## Executando os Testes
+## CenÃ¡rios de Teste Implementados
 
-Este projeto possui um teste simples de login, no qual o **Selenium** realiza a navegação para a página de login, insere as credenciais e valida se o login foi bem-sucedido.
+- âœ… Login com credenciais vÃ¡lidas.
+- âŒ Login com credenciais invÃ¡lidas.
+- âŒ Tentativa de login com campos vazios.
 
-O cenário de teste é escrito em **C#** com o framework **LightBDD** e está estruturado da seguinte forma:
+> Os cenÃ¡rios âŒ serÃ£o implementados gradualmente. A base jÃ¡ estÃ¡ preparada para incluÃ­-los.
 
-- **Given**: Inicializa o navegador e acessa a página de login.
-- **When**: Insere as credenciais válidas e clica no botão de login.
-- **Then**: Verifica se a página de inventário é exibida, indicando que o login foi realizado com sucesso.
+## Estilo BDD com LightBDD
 
-## Execução no GitHub Actions (CI/CD)
+Este projeto utiliza **LightBDD** para organizar os testes no estilo **Given-When-Then**. Exemplo:
 
-Este projeto também pode ser executado no GitHub Actions para integração contínua.
+```csharp
+[Scenario]
+public void User_logs_in_successfully()
+{
+    Runner.RunScenario(
+        given => GivenIAmOnTheLoginPage(),
+        when => WhenIEnterValidCredentials(),
+        then => ThenIShouldBeLoggedIn()
+    );
+}
 
-### Configuração no GitHub Actions:
 
-1. O arquivo `.yml` no diretório `.github/workflows` foi configurado para:
+## ğŸ§ª CenÃ¡rios de Testes Implementados
 
-   - Configurar o ambiente com .NET SDK.
-   - Instalar dependências.
-   - Executar os testes.
-   - Gerar relatórios de execução dos testes (se estiver configurado).
-   
-2. O processo de execução é automatizado e garante que todos os testes sejam executados sempre que um commit for enviado para o repositório.
+### âœ… CenÃ¡rio 1 â€“ Login com credenciais vÃ¡lidas
 
-## Licença
+- Acessa a pÃ¡gina de login
+- Insere credenciais vÃ¡lidas
+- Verifica que a pÃ¡gina de inventÃ¡rio estÃ¡ visÃ­vel
 
-Este projeto é licenciado sob a licença MIT - consulte o arquivo [LICENSE](LICENSE) para mais informações.
+### ğŸš« CenÃ¡rio 2 â€“ Login com usuÃ¡rio invÃ¡lido
+
+- Acessa a pÃ¡gina de login
+- Tenta login com usuÃ¡rio invÃ¡lido
+- Verifica a exibiÃ§Ã£o de mensagem de erro
+
+### ğŸš« CenÃ¡rio 3 â€“ Login com senha invÃ¡lida
+
+- Acessa a pÃ¡gina de login
+- Tenta login com senha invÃ¡lida
+- Verifica a exibiÃ§Ã£o de mensagem de erro
+
+### âš ï¸ CenÃ¡rio 4 â€“ Tentativa de login com campos vazios
+
+- Acessa a pÃ¡gina de login
+- Clica no botÃ£o de login com campos vazios
+- Verifica que uma mensagem de erro Ã© exibida
+
+## ğŸ” CI/CD com GitHub Actions
+
+A pipeline de CI no GitHub executa automaticamente os testes a cada push ou pull request para a branch `master`. Isso garante a validaÃ§Ã£o contÃ­nua dos testes.
+
+## ğŸ¤ ContribuiÃ§Ã£o
+
+Sinta-se Ã  vontade para contribuir! Crie uma branch, realize suas melhorias e envie um pull request. SugestÃµes de novos testes e melhorias sÃ£o bem-vindas.
+
+## ğŸ“ LicenÃ§a
+
+Este projeto estÃ¡ sob a licenÃ§a MIT. Veja o arquivo [LICENSE](LICENSE) para mais detalhes.

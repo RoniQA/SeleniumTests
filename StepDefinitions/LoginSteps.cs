@@ -6,68 +6,62 @@ using OpenQA.Selenium.Chrome;
 using WebDriverManager;
 using WebDriverManager.DriverConfigs.Impl;
 using Xunit;
+using SeleniumTests.Pages;
 
-namespace SeleniumTests.StepDefinitions
+namespace SeleniumTests.Steps
 {
-    public partial class LoginSteps : FeatureFixture, IDisposable
+    public class LoginSteps : IDisposable
     {
-        private IWebDriver _driver;
+        private readonly IWebDriver _driver;
+        private readonly LoginPage _loginPage;
 
         public LoginSteps()
         {
             new DriverManager().SetUpDriver(new ChromeConfig());
-            _driver = new ChromeDriver(ConfigureChromeOptions());
-        }
-
-        private ChromeOptions ConfigureChromeOptions()
-        {
             var options = new ChromeOptions();
             options.AddArgument("--headless");
-            options.AddArgument("--no-sandbox");
-            options.AddArgument("--disable-dev-shm-usage");
-            options.AddArgument("--remote-debugging-port=9222");
-            options.AddArgument("--disable-gpu");
-            return options;
+            _driver = new ChromeDriver(options);
+            _loginPage = new LoginPage(_driver);
         }
 
-        [Scenario]
-        public void UserLogsInSuccessfully()
+        public void Given_I_am_on_login_page() => _loginPage.Navigate();
+
+        public void When_I_login_with_valid_credentials() =>
+            _loginPage.Login("standard_user", "secret_sauce");
+
+        public void Then_I_should_see_the_inventory_page() =>
+            Assert.True(_loginPage.InventoryList.Displayed);
+
+        public void When_I_login_with_invalid_username() =>
+            _loginPage.Login("invalid_user", "secret_sauce");
+
+        public void When_I_login_with_invalid_password() =>
+            _loginPage.Login("standard_user", "wrong_password");
+
+        public void When_I_attempt_to_login_with_empty_fields() =>
+            _loginPage.Login("", "");
+
+        public void Then_I_should_see_a_login_error()
         {
-            Runner.RunScenario(
-                given => GivenIAmOnTheLoginPage(),
-                when => WhenIEnterValidCredentials(),
-                then => ThenIShouldBeLoggedIn()
-            );
+            var errorMessage = _loginPage.ErrorMessage;
+            Assert.True(errorMessage.Displayed);
+            Assert.Contains("Epic sadface", errorMessage.Text);
         }
 
-        private void GivenIAmOnTheLoginPage()
+        public void Then_I_should_see_required_field_error()
         {
-            _driver.Navigate().GoToUrl("https://www.saucedemo.com/");
-            System.Threading.Thread.Sleep(1000);
+            var errorMessage = _loginPage.ErrorMessage;
+            Assert.True(errorMessage.Displayed);
+            Assert.Contains("Epic sadface", errorMessage.Text);
         }
 
-        private void WhenIEnterValidCredentials()
+        public void Then_I_should_see_an_error_message()
         {
-            var usernameField = _driver.FindElement(By.Id("user-name"));
-            var passwordField = _driver.FindElement(By.Id("password"));
-            var loginButton = _driver.FindElement(By.Id("login-button"));
-
-            usernameField.SendKeys("standard_user");
-            passwordField.SendKeys("secret_sauce");
-            loginButton.Click();
-
-            System.Threading.Thread.Sleep(2000);
+            var errorMessage = _loginPage.ErrorMessage;
+            Assert.True(errorMessage.Displayed);
+            Assert.Contains("Epic sadface", errorMessage.Text);
         }
 
-        private void ThenIShouldBeLoggedIn()
-        {
-            var inventoryPage = _driver.FindElement(By.ClassName("inventory_list"));
-            Assert.True(inventoryPage.Displayed, "Página de inventário não exibida.");
-        }
-
-        public void Dispose()
-        {
-            _driver.Quit();
-        }
+        public void Dispose() => _driver.Quit();
     }
 }

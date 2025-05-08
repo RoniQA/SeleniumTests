@@ -11,31 +11,24 @@ namespace SeleniumTests.Pages
             _driver = driver;
         }
 
-        private IWebElement UsernameInput => _driver.FindElement(By.Id("user-name"));
-        private IWebElement PasswordInput => _driver.FindElement(By.Id("password"));
-        private IWebElement LoginButton => _driver.FindElement(By.Id("login-button"));
-
-        public void EnterUsername(string username)
+        public void Navigate()
         {
-            UsernameInput.Clear();
-            UsernameInput.SendKeys(username);
+            _driver.Navigate().GoToUrl("https://www.saucedemo.com/");
         }
 
-        public void EnterPassword(string password)
+        public void Login(string username, string password)
         {
-            PasswordInput.Clear();
-            PasswordInput.SendKeys(password);
+            _driver.FindElement(By.Id("user-name")).Clear();
+            _driver.FindElement(By.Id("user-name")).SendKeys(username);
+
+            _driver.FindElement(By.Id("password")).Clear();
+            _driver.FindElement(By.Id("password")).SendKeys(password);
+
+            _driver.FindElement(By.Id("login-button")).Click();
         }
 
-        public void ClickLoginButton()
-        {
-            LoginButton.Click();
-        }
+        public IWebElement InventoryList => _driver.FindElement(By.Id("inventory_container"));
 
-        public bool IsLoggedIn()
-        {
-            // Ajuste conforme o comportamento esperado pós-login
-            return _driver.Url.Contains("inventory");
-        }
+        public IWebElement ErrorMessage => _driver.FindElement(By.CssSelector("[data-test='error']"));
     }
 }
