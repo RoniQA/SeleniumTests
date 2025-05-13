@@ -18,6 +18,7 @@ namespace SeleniumTests.Features
                 _ => steps.Then_I_should_see_the_inventory_page()
             );
         }
+
         [Scenario]
         public void Login_with_invalid_password()
         {
@@ -29,6 +30,7 @@ namespace SeleniumTests.Features
                 _ => steps.Then_I_should_see_an_error_message()
             );
         }
+
         [Scenario]
         public void Login_with_invalid_username()
         {
@@ -40,6 +42,7 @@ namespace SeleniumTests.Features
                 _ => steps.Then_I_should_see_a_login_error()
             );
         }
+
         [Scenario]
         public void Login_with_empty_fields()
         {

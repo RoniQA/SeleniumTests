@@ -19,6 +19,7 @@ namespace SeleniumTests.Steps
             var options = new ChromeOptions();
             options.AddArgument("--headless");
             _driver = new ChromeDriver(options);
+
             _loginPage = new LoginPage(_driver);
         }
 
@@ -37,16 +38,7 @@ namespace SeleniumTests.Steps
         public void When_I_login_with_invalid_password() =>
             _loginPage.Login("standard_user", "wrong_password");
 
-        public void When_I_attempt_to_login_with_empty_fields() =>
-            _loginPage.Login("", "");
-
         public void Then_I_should_see_a_login_error()
-        {
-            Assert.True(_loginPage.IsErrorMessageVisible);
-            Assert.Contains("Epic sadface", _loginPage.ErrorMessageText);
-        }
-
-        public void Then_I_should_see_required_field_error()
         {
             Assert.True(_loginPage.IsErrorMessageVisible);
             Assert.Contains("Epic sadface", _loginPage.ErrorMessageText);
@@ -58,6 +50,16 @@ namespace SeleniumTests.Steps
             Assert.Contains("Epic sadface", _loginPage.ErrorMessageText);
         }
 
-        public void Dispose() => _driver.Quit();
+        public void When_I_attempt_to_login_with_empty_fields() =>
+            _loginPage.Login("", "");
+
+        public void Then_I_should_see_required_field_error()
+        {
+            Assert.True(_loginPage.IsErrorMessageVisible);
+            Assert.Contains("Epic sadface", _loginPage.ErrorMessageText);
+        }
+
+        public void Dispose() =>
+            _driver.Quit();
     }
 }

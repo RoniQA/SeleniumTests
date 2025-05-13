@@ -27,7 +27,12 @@ jobs:
       - name: Install Chrome
         run: |
           sudo apt-get update
-          sudo apt-get install -y google-chrome-stable
+          sudo apt-get install -y google-chrome-stable \
+            libappindicator3-1 libasound2 libatk-bridge2.0-0 libnspr4 \
+            libnss3 libxss1 xdg-utils fonts-liberation
+
+      - name: Set CHROME_BIN environment variable
+        run: echo "CHROME_BIN=$(which google-chrome)" >> $GITHUB_ENV
 
       - name: Build project
         run: dotnet build --configuration Release
