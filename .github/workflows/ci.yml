@@ -2,11 +2,11 @@ name: Run Selenium Tests
 
 on:
   push:
-    branches:
-      - master
+    branches: 
+      - '**'  # qualquer branch
   pull_request:
     branches:
-      - master
+      - master  # PRs com destino à master
 
 jobs:
   build:
